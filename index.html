@@ -27,7 +27,7 @@
       const loader = new GLTFLoader();
       let glassesModel;
 
-      loader.load('assets/models/stereo-glasses.glb', (gltf) => {
+      loader.load('assets/Models/stereo-glasses.glb', (gltf) => {
         glassesModel = gltf.scene;
         glassesModel.scale.set(0.1, 0.1, 0.1); // Ajusta estas escalas según sea necesario
         scene.add(glassesModel);
