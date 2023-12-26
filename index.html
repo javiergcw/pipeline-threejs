@@ -1,3 +1,4 @@
+
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -5,72 +6,49 @@
     <script type="importmap">
     {
       "imports": {
-        "three": "https://unpkg.com/three@0.153.0/build/three.module.js",
-        "three/addons/": "https://unpkg.com/three@0.153.0/examples/jsm/",
-        "mindar-face-three": "https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-face-three.prod.js"
+	"three": "https://unpkg.com/three@0.153.0/build/three.module.js",
+	"three/addons/": "https://unpkg.com/three@0.153.0/examples/jsm/",
+	"mindar-face-three":"https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-face-three.prod.js"
       }
     }
     </script>
     <script type="module">
       import * as THREE from 'three';
       import { MindARThree } from 'mindar-face-three';
-      import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-
       const mindarThree = new MindARThree({
-        container: document.querySelector("#container"),
+	container: document.querySelector("#container"),
       });
       const {renderer, scene, camera} = mindarThree;
-
-      const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+      const light = new THREE.HemisphereLight( 0xffffff, 0xbbbbff, 1 );
       scene.add(light);
-
-      const loader = new GLTFLoader();
-      let glassesModel;
-
-      loader.load('assets/Models/stereo-glasses.glb', (gltf) => {
-        glassesModel = gltf.scene;
-        glassesModel.scale.set(0.1, 0.1, 0.1); // Ajusta estas escalas según sea necesario
-        scene.add(glassesModel);
-        glassesModel.visible = false; // Inicialmente ocultar los lentes
-      });
-
+      const faceMesh = mindarThree.addFaceMesh();
+      const texture = new THREE.TextureLoader().load('https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.2/examples/face-tracking/assets/canonical_face_model_uv_visualization.png');
+      faceMesh.material.map = texture;
+      faceMesh.material.transparent = true;
+      faceMesh.material.needsUpdate = true;
+      scene.add(faceMesh);
       const start = async() => {
-        await mindarThree.start();
-        const faceTracker = mindarThree.faceTracker;
-        faceTracker.onUpdate(() => {
-          if (glassesModel && faceTracker.isTracking()) {
-            const faceAnchor = faceTracker.getAnchor(0);
-
-            if (faceAnchor) {
-              glassesModel.position.copy(faceAnchor.position);
-              glassesModel.quaternion.copy(faceAnchor.quaternion);
-              glassesModel.scale.set(0.1, 0.1, 0.1); // Ajusta la escala si es necesario
-              glassesModel.visible = true;
-            }
-          } else if (glassesModel) {
-            glassesModel.visible = false;
-          }
-        });
-
-        renderer.setAnimationLoop(() => {
-          renderer.render(scene, camera);
-        });
+	await mindarThree.start();
+	renderer.setAnimationLoop(() => {
+	  renderer.render(scene, camera);
+	});
       }
       start();
     </script>
     <style>
       body {
-        margin: 0;
+	margin: 0;
       }
       #container {
-        width: 100vw;
-        height: 100vh;
-        position: relative;
-        overflow: hidden;
+	width: 100vw;
+	height: 100vh;
+	position: relative;
+	overflow: hidden;
       }
     </style>
   </head>
   <body>
-    <div id="container"></div>
+    <div id="container">
+    </div>
   </body>
 </html>
